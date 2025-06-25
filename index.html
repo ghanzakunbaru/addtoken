@@ -1,80 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Add Token Web</title>
+  <meta charset="UTF-8" />
+  <title>Tambah Token Bot Telegram</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1d3557, #457b9d);
-      color: #f1faee;
-      padding: 30px;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #1e3c72, #2a5298);
       margin: 0;
+      padding: 40px;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
     }
-    .container {
-      background-color: #ffffff10;
-      backdrop-filter: blur(10px);
+    .card {
+      background: white;
       border-radius: 12px;
       padding: 30px;
+      max-width: 400px;
       width: 100%;
-      max-width: 500px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
     h2 {
-      margin-top: 0;
-      font-size: 1.5rem;
       text-align: center;
-      color: #f1faee;
+      color: #333;
+      margin-bottom: 20px;
     }
     input {
       width: 100%;
       padding: 12px;
-      margin-top: 15px;
-      border: none;
       border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
       font-size: 16px;
-      outline: none;
     }
     button {
       width: 100%;
-      margin-top: 15px;
       padding: 12px;
-      background-color: #e63946;
-      color: white;
+      background: #007bff;
       border: none;
-      border-radius: 8px;
+      color: white;
       font-size: 16px;
+      border-radius: 8px;
       cursor: pointer;
       transition: background 0.3s ease;
     }
     button:hover {
-      background-color: #d62828;
+      background: #0056b3;
     }
-    pre {
-      background-color: #f1faee;
-      color: #1d3557;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 20px;
-      white-space: pre-wrap;
+    .result {
+      margin-top: 15px;
       font-size: 14px;
+      color: #333;
+      background: #f8f8f8;
+      padding: 10px;
+      border-radius: 8px;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Tambah Token Bot Telegram 🧠</h2>
-    <input type="text" id="token" placeholder="Masukkan token bot Telegram..." required />
-    <button onclick="addToken()">➕ Add Token</button>
-    <pre id="output"></pre>
+  <div class="card">
+    <h2>Tambah Token Bot 🧠</h2>
+    <input type="text" id="token" placeholder="Masukkan token bot Telegram..." />
+    <button onclick="addToken()">Tambah Token</button>
+    <div class="result" id="output"></div>
   </div>
 
   <script>
@@ -87,7 +79,10 @@
       const token = document.getElementById("token").value.trim();
       const output = document.getElementById("output");
 
-      if (!token) return alert("Token tidak boleh kosong!");
+      if (!token) {
+        output.textContent = "❌ Token tidak boleh kosong!";
+        return;
+      }
 
       let sha = null;
       let json = [];
@@ -104,8 +99,14 @@
           const parsed = JSON.parse(content);
           json = Array.isArray(parsed) ? parsed : [];
         }
-      } catch {
+      } catch (e) {
         json = [];
+      }
+
+      // Cek duplikat
+      if (json.find(item => item.token === token)) {
+        output.textContent = "⚠️ Token sudah terdaftar di database.";
+        return;
       }
 
       json.push({ token, date: new Date().toISOString() });
@@ -117,149 +118,14 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          message: "Add Telegram token",
+          message: "Tambah token dari web",
           content: btoa(JSON.stringify(json, null, 2)),
           sha
         })
       });
 
       if (updateRes.ok) {
-        output.textContent = "✅ Token berhasil ditambahkan.";
-        document.getElementById("token").value = "";
-      } else {
-        const err = await updateRes.json();
-        output.textContent = "❌ Error:\n" + JSON.stringify(err, null, 2);
-      }
-    }
-  </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Add Token Web</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1d3557, #457b9d);
-      color: #f1faee;
-      padding: 30px;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-    .container {
-      background-color: #ffffff10;
-      backdrop-filter: blur(10px);
-      border-radius: 12px;
-      padding: 30px;
-      width: 100%;
-      max-width: 500px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    }
-    h2 {
-      margin-top: 0;
-      font-size: 1.5rem;
-      text-align: center;
-      color: #f1faee;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin-top: 15px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      outline: none;
-    }
-    button {
-      width: 100%;
-      margin-top: 15px;
-      padding: 12px;
-      background-color: #e63946;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background-color: #d62828;
-    }
-    pre {
-      background-color: #f1faee;
-      color: #1d3557;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 20px;
-      white-space: pre-wrap;
-      font-size: 14px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Tambah Token Bot Telegram 🧠</h2>
-    <input type="text" id="token" placeholder="Masukkan token bot Telegram..." required />
-    <button onclick="addToken()">➕ Add Token</button>
-    <pre id="output"></pre>
-  </div>
-
-  <script>
-    const GITHUB_REPO = "ghanzakunbaru/Ghanznew";
-    const GITHUB_FILE_PATH = "tokens.json";
-    const GITHUB_PAT = "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";
-    const API_URL = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
-
-    async function addToken() {
-      const token = document.getElementById("token").value.trim();
-      const output = document.getElementById("output");
-
-      if (!token) return alert("Token tidak boleh kosong!");
-
-      let sha = null;
-      let json = [];
-
-      try {
-        const res = await fetch(API_URL, {
-          headers: { Authorization: `token ${GITHUB_PAT}` }
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          sha = data.sha;
-          const content = atob(data.content.replace(/\n/g, ""));
-          const parsed = JSON.parse(content);
-          json = Array.isArray(parsed) ? parsed : [];
-        }
-      } catch {
-        json = [];
-      }
-
-      json.push({ token, date: new Date().toISOString() });
-
-      const updateRes = await fetch(API_URL, {
-        method: "PUT",
-        headers: {
-          Authorization: `token ${GITHUB_PAT}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: "Add Telegram token",
-          content: btoa(JSON.stringify(json, null, 2)),
-          sha
-        })
-      });
-
-      if (updateRes.ok) {
-        output.textContent = "✅ Token berhasil ditambahkan.";
+        output.textContent = "✅ Token berhasil ditambahkan ke database!";
         document.getElementById("token").value = "";
       } else {
         const err = await updateRes.json();
